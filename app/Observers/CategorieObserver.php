@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Observers;
+use App\Models\Log;
+use App\Models\Categories;
+use App\Models\User;
 
 class CategorieObserver
 {

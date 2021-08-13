@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\LogsReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,4 +26,5 @@ Route::post('login', 'App\Http\Controllers\UserController@login')->name('login')
 Route::middleware('auth:api')->group( function () {
     Route::resource('produtos', ProductsController::class);
     Route::resource('categorias', CategoriesController::class);
+    Route::resource('logs', LogsReportController::class);
 });

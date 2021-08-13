@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Observers;
+use App\Models\Log;
+use App\Models\Products;
+use App\Models\User;
 
 class ProductObserver
 {
