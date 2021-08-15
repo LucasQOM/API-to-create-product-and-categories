@@ -46,12 +46,12 @@ class CategoriesController extends UserController
         return $this->sendResponse(new CategorieResource($categories), 'Categoria selecionado com sucesso.');
     }
 
-    public function update(Request $request, Categories $categories, $id)
+    public function update(Request $request, $id)
     {
         $input = Categories::findOrFail($id);
 
 
-        $validator = Validator::make($input, [
+        $validator = Validator::make($request->all(), [
             'name' => 'required',
         ]);
 
@@ -59,10 +59,9 @@ class CategoriesController extends UserController
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        $categories->name = $input('name');
-        $categories->update();
+        $input->update($request->all());
 
-        return $this->sendResponse(new CategorieResource($categories), 'Categoria atualizado com sucesso.');
+        return $this->sendResponse(new CategorieResource($input), 'Categoria atualizado com sucesso.');
     }
 
     public function destroy(Categories $categories, $id)

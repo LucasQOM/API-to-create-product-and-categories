@@ -51,10 +51,9 @@ class ProductsController extends UserController
         return $this->sendResponse(new ProductResource($product), 'Produto selecionado com sucesso.');
     }
 
-    public function update(Request $request, Products $products, $id)
+    public function update(Request $request, $id)
     {
         $input = Products::findOrFail($id);
-
 
         $validator = Validator::make($request->all(), [
             'name' => 'required',
@@ -70,16 +69,9 @@ class ProductsController extends UserController
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        $products->name = $request->input('name');
-        $products->categories_id = $request->input('categories_id');
-        $products->code = $request->input('code');
-        $products->composition = $request->input('composition');
-        $products->price = $request->input('price');
-        $products->size = $request->input('size');
-        $products->file = $request->input('file');
-        $products->update();
+        $input->update($request->all());
 
-        return $this->sendResponse(new ProductResource($products), 'Produto atualizado com sucesso.');
+        return $this->sendResponse(new ProductResource($input), 'Produto atualizado com sucesso.');
     }
 
     public function destroy(Products $products, $id)
