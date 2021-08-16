@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Categories;
-use App\Http\Resources\CategorieResource;
+use App\Http\Resources\CategoryResource;
 use Validator;
 
 class CategoriesController extends UserController
@@ -13,7 +13,7 @@ class CategoriesController extends UserController
     {
         $categories = Categories::all();
 
-        return $this->sendResponse(CategorieResource::collection($categories), 'Categorias listadas com sucesso.');
+        return $this->sendResponse(CategoryResource::collection($categories), 'Categorias listadas com sucesso.');
     }
 
 
@@ -32,7 +32,7 @@ class CategoriesController extends UserController
         $categories = Categories::create($input);
 
 
-        return $this->sendResponse(new CategorieResource($categories), 'Categoria criado com sucesso.');
+        return $this->sendResponse(new CategoryResource($categories), 'Categoria criado com sucesso.');
     }
 
     public function show($id)
@@ -43,7 +43,7 @@ class CategoriesController extends UserController
             return $this->sendError('Categoria não encontrada.');
         }
 
-        return $this->sendResponse(new CategorieResource($categories), 'Categoria selecionado com sucesso.');
+        return $this->sendResponse(new CategoryResource($categories), 'Categoria selecionado com sucesso.');
     }
 
     public function update(Request $request, $id)
@@ -61,7 +61,7 @@ class CategoriesController extends UserController
 
         $input->update($request->all());
 
-        return $this->sendResponse(new CategorieResource($input), 'Categoria atualizado com sucesso.');
+        return $this->sendResponse(new CategoryResource($input), 'Categoria atualizado com sucesso.');
     }
 
     public function destroy(Categories $categories, $id)

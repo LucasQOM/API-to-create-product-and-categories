@@ -5,7 +5,7 @@ use App\Models\Log;
 use App\Models\Categories;
 use App\Models\User;
 
-class CategorieObserver
+class CategoryObserver
 {
     protected $log;
     protected $categories;

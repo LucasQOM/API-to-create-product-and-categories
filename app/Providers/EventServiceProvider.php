@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Event;
 use App\Models\Products;
 use App\Models\Categories;
 use App\Observers\ProductObserver;
-use App\Observers\CategorieObserver;
+use App\Observers\CategoryObserver;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -32,6 +32,6 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         Products::observe(ProductObserver::class);
-        Categories::observe(CategorieObserver::class);
+        Categories::observe(CategoryObserver::class);
     }
 }
