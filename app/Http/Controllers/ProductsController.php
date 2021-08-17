@@ -21,25 +21,18 @@ class ProductsController extends UserController
     {
         $input = $request->all();
 
-        foreach($request->file('file') as $file)
-        {
-
-            $input = ['file' => $file->store('file', 'public')];
-            dd($file);
+        $validator = Validator::make($input, [
+            'name' => 'required',
+            'categories_id' => 'required',
+            'code' => 'required',
+            'composition' => 'required',
+            'price' => 'required',
+            'size' => 'required',
+            'file' => 'file|mimes:jpg',
+        ]);
+        if($validator->fails()){
+            return $this->sendError('Erro.', $validator->errors());
         }
-
-        // $validator = Validator::make($input, [
-        //     'name' => 'required',
-        //     'categories_id' => 'required',
-        //     'code' => 'required',
-        //     'composition' => 'required',
-        //     'price' => 'required',
-        //     'size' => 'required',
-        //     'file' => 'array|max:3|mimes:jpg|required',
-        // ]);
-        // if($validator->fails()){
-        //     return $this->sendError('Erro.', $validator->errors());
-        // }
 
         $products = Products::create($input);
 
