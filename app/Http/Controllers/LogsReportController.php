@@ -11,10 +11,7 @@ class LogsReportController extends UserController
     protected $log;
     protected $request;
 
-    public function __construct(
-        Log $log,
-        Request $request,
-    )
+    public function __construct(Log $log,Request $request)
     {
         $this->log = $log;
         $this->request = $request;
@@ -31,6 +28,7 @@ class LogsReportController extends UserController
                 users.name,
                 logs.activity,
                 logs.data,
+                logs.type,
                 logs.model,
                 CASE
                     WHEN logs.type = 'create' THEN 'Criado'
@@ -45,6 +43,6 @@ class LogsReportController extends UserController
             $logs->orderBy("logs.created_at", "DESC");
             $logs = $logs->get();
 
-            return $this->sendResponse(LogResource::collection($logs), 'Registros listados com sucesso.');
+            return response()->json(['status' => 200, 'data' => LogResource::collection($logs), 'message' => 'Registros listados com sucesso.']);
     }
 }

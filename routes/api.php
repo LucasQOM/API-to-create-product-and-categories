@@ -18,13 +18,16 @@ use App\Http\Controllers\LogsReportController;
 |
 */
 
-Route::post('register', 'App\Http\Controllers\UserController@register')->name('register');
+Route::post('registrar', 'App\Http\Controllers\UserController@register')->name('register');
 Route::post('login', 'App\Http\Controllers\UserController@login')->name('login');
 
 
 
 Route::middleware('auth:api')->group( function () {
-    Route::resource('produtos', ProductsController::class);
-    Route::resource('categorias', CategoriesController::class);
-    Route::resource('logs', LogsReportController::class);
+    // route::apiResource('produtos', ProductsController::class);
+    // route::apiResource('categorias', CategoriesController::class);
+    // route::apiResource('logs', LogsReportController::class);
+   Route::resource('produtos', ProductsController::class);
+   Route::resource('categorias', CategoriesController::class);
+   Route::resource('logs', LogsReportController::class);
 });

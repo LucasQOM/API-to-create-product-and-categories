@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\ProductCreateRequest;
+use App\Http\Requests\ProductEditRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use App\Models\Products;
 use App\Http\Resources\ProductResource;
-use Validator;
+use Illuminate\Http\Request;
 
 class ProductsController extends UserController
 {
@@ -13,31 +15,32 @@ class ProductsController extends UserController
     {
         $products = Products::all();
 
-        return $this->sendResponse(ProductResource::collection($products), 'Produtos listados com sucesso.');
+        return response()->json(['status' => 200, 'data' => ProductResource::collection($products), 'message' => 'Produto listado com sucesso.']);
     }
 
-
-    public function store(Request $request)
+    public function store(ProductCreateRequest $request)
     {
-        $input = $request->all();
+        try {
+            $input = $request->validated();
 
-        $validator = Validator::make($input, [
-            'name' => 'required',
-            'categories_id' => 'required',
-            'code' => 'required',
-            'composition' => 'required',
-            'price' => 'required',
-            'size' => 'required',
-            'file' => 'file|mimes:jpg',
-        ]);
-        if($validator->fails()){
-            return $this->sendError('Erro.', $validator->errors());
+            $input['file'] = [];
+            $fileCount = 0;
+            if ($request->hasFile('file')) {
+                foreach ($request->file('file') as $file) {
+                    $file->move(public_path('products/'), $request->name . "_" . ++$fileCount . "." . $file->getClientOriginalExtension());
+                    array_push($input['file'], 'products/' . $request->name . "_" . $fileCount . "." . $file->getClientOriginalExtension());
+                }
+            }
+
+            $products = Products::create($input);
+        } catch (\Exception $e) {
+            if (env('APP_DEBUG')) {
+                throw new HttpResponseException(response()->json(['status' => 500, 'data' => $e->getMessage()]));
+            } else
+                throw new HttpResponseException(response()->json(['status' => 500, 'data' => 'Ocorreu um erro ao gravar este produto!']));
         }
 
-        $products = Products::create($input);
-
-
-        return $this->sendResponse(new ProductResource($products), 'Produto criado com sucesso.');
+        return response()->json(['status' => 201, 'data' => new ProductResource($products), 'message' => 'Produto criado com sucesso.']);
     }
 
     public function show($id)
@@ -45,39 +48,52 @@ class ProductsController extends UserController
         $product = Products::find($id);
 
         if (is_null($product)) {
-            return $this->sendError('Product not found.');
+            return response()->json(['status' => 404, 'data' => 'produto não encontrado!']);
         }
 
-        return $this->sendResponse(new ProductResource($product), 'Produto selecionado com sucesso.');
+        return response()->json(['status' => 200, 'data' => $product, 'message' => 'produto selecionado com sucesso!']);
     }
 
-    public function update(Request $request, $id)
+    public function update(ProductEditRequest $request, $id)
     {
-        $input = Products::findOrFail($id);
+        try {
+            $input = Products::find($id);
+            $updatedProduct = $request->validated();
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'categories_id' => 'required',
-            'code' => 'required',
-            'composition' => 'required',
-            'price' => 'required',
-            'size' => 'required',
-            'file' => 'file|mimes:jpg',
-        ]);
+            if ($request->hasFile('file')) {
+                $updatedProduct['file'] = array();
+                $fileCount = 0;
 
-        if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());
+                if (!is_null($input->file)) {
+                    foreach ($input->file as $oldFile) {
+                        if (file_exists(public_path($oldFile))) {
+                            unlink(public_path($oldFile));
+                        }
+                    }
+                }
+                foreach ($request->file('file') as $file) {
+                    $file->move(public_path('products/'), $request->name . "_" . ++$fileCount . "." . $file->getClientOriginalExtension());
+                    array_push($updatedProduct['file'], 'products/' . $request->name . "_" . $fileCount . "." . $file->getClientOriginalExtension());
+                }
+            } else {
+                unset($updatedProduct['file']);
+            }
+
+            $input->update($updatedProduct);
+        } catch (\Exception $e) {
+            if (env('APP_DEBUG')) {
+                throw new HttpResponseException(response()->json(['error' => $e->getMessage()], 500));
+            } else {
+                throw new HttpResponseException(response()->json(['error' => 'An error ocurred, in the update product attempt!'], 500));
+            }
         }
-
-        $input->update($request->all());
-
-        return $this->sendResponse(new ProductResource($input), 'Produto atualizado com sucesso.');
+        return response()->json(['status' => 200, 'data' => $input , 'message' => 'Produto atualizado com sucesso!'], 201);
     }
 
     public function destroy(Products $products, $id)
     {
         $products = Products::findOrFail($id);
         $products->delete();
-        return $this->sendResponse([], 'Produto deletado com sucesso.');
+        return response()->json(['success' => 200, 'data' => 'produto deletado com sucesso!']);
     }
 }

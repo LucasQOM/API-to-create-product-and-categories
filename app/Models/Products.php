@@ -8,17 +8,30 @@ use Illuminate\Database\Eloquent\Model;
 class Products extends Model
 {
     use HasFactory;
-
+/**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'name',
+        'quantity',
         'categories_id',
-        'code',
         'price',
+        'composition',
         'file',
         'size',
-        'composition'
+        'code'
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'file' => 'array',
+    ];
 
     public function categories()
     {

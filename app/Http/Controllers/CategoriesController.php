@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CategoyRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use App\Models\Categories;
 use App\Http\Resources\CategoryResource;
-use Validator;
 
 class CategoriesController extends UserController
 {
@@ -13,26 +14,23 @@ class CategoriesController extends UserController
     {
         $categories = Categories::all();
 
-        return $this->sendResponse(CategoryResource::collection($categories), 'Categorias listadas com sucesso.');
+        return response()->json(['status' => 200, 'data' => CategoryResource::collection($categories), 'message' => 'Categorias listada com sucesso.']);
     }
 
 
-    public function store(Request $request)
+    public function store(CategoyRequest $request)
     {
-        $input = $request->all();
+        try {
+            $input = $request->all();
 
-        $validator = Validator::make($input, [
-            'name' => 'required',
-
-        ]);
-        if($validator->fails()){
-            return $this->sendError('Erro.', $validator->errors());
+            $categories = Categories::create($input);
+        }catch (\Exception $e){
+            if (env('APP_DEBUG')){
+                throw new HttpResponseException(response()->json(['status' => 500, 'data' => $e->getMessage()]));
+            } else
+                throw new HttpResponseException(response()->json(['status' => 500, 'data' => 'Ocorreu um erro ao gravar essa categoria!']));
         }
-
-        $categories = Categories::create($input);
-
-
-        return $this->sendResponse(new CategoryResource($categories), 'Categoria criado com sucesso.');
+        return response()->json(['success' => new CategoryResource($categories), 'Categoria criada com sucesso.'], 201);
     }
 
     public function show($id)
@@ -40,35 +38,34 @@ class CategoriesController extends UserController
         $categories = Categories::find($id);
 
         if (is_null($categories)) {
-            return $this->sendError('Categoria não encontrada.');
+            return response()->json(['status' => 404, 'data' => 'categoria não encontrada!']);
         }
 
-        return $this->sendResponse(new CategoryResource($categories), 'Categoria selecionado com sucesso.');
+        return response()->json(['success' => 200, 'data' => $categories, 'message' => 'categoria selecionada com sucesso!']);
     }
 
-    public function update(Request $request, $id)
+    public function update(CategoyRequest $request, $id)
     {
-        $input = Categories::findOrFail($id);
+        try {
+            $input = Categories::findOrFail($id);
 
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-        ]);
-
-        if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());
+            $input->update($request->all());
+        }catch (\Exception $e){
+            if (env('APP_DEBUG')){
+                throw new HttpResponseException(response()->json(['status' => 500, 'data' => $e->getMessage()]));
+            } else
+                throw new HttpResponseException(response()->json(['status' => 500, 'data' => 'Ocorreu um erro ao atualizar essa categoria!']));
         }
 
-        $input->update($request->all());
 
-        return $this->sendResponse(new CategoryResource($input), 'Categoria atualizado com sucesso.');
+        return response()->json(['success' => 200, 'data' => new CategoryResource($input), 'message' => 'categoria atualizada com sucesso!']);
     }
 
     public function destroy(Categories $categories, $id)
     {
         $categories = Categories::findOrFail($id);
         $categories->delete();
-        return $this->sendResponse([], 'Categoria deletado com sucesso.');
+        return response()->json(['success' => 200, 'data' => 'produto deletado com sucesso!']);
     }
 }
 
