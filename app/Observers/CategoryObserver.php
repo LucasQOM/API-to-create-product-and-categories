@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 use App\Models\Log;
-use App\Models\Categories;
+use App\Models\Category;
 use App\Models\User;
 
 class CategoryObserver
@@ -17,27 +17,27 @@ class CategoryObserver
         $this->users = $users;
     }
 
-    public function created(Categories $categorie)
+    public function created(Category $category)
     {
         $log = [
             "user_id" => auth()->user()->id ?? 1,
             "activity" => "Categoria cadastrada",
-            "data" => json_encode($categorie),
+            "data" => json_encode($category),
             "type" => "create",
-            "model" => "Categorie"
+            "model" => "Category"
         ];
 
         $this->log->create($log);
     }
 
-    public function deleted(Categories $categorie)
+    public function deleted(Category $category)
     {
         $log = [
             "user_id" => auth()->user()->id ?? 1,
             "activity" => "Categoria deletada",
-            "data" => json_encode($categorie),
+            "data" => json_encode($category),
             "type" => "delete",
-            "model" => "Categorie"
+            "model" => "Category"
         ];
 
         $this->log->create($log);

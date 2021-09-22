@@ -5,14 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CategoyRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
-use App\Models\Categories;
+use App\Models\Category;
 use App\Http\Resources\CategoryResource;
 
 class CategoriesController extends UserController
 {
     public function index()
     {
-        $categories = Categories::all();
+        $categories = Category::all();
 
         return response()->json(['status' => 200, 'data' => CategoryResource::collection($categories), 'message' => 'Categorias listada com sucesso.']);
     }
@@ -23,7 +23,7 @@ class CategoriesController extends UserController
         try {
             $input = $request->all();
 
-            $categories = Categories::create($input);
+            $categories = Category::create($input);
         }catch (\Exception $e){
             if (env('APP_DEBUG')){
                 throw new HttpResponseException(response()->json(['status' => 500, 'data' => $e->getMessage()]));
@@ -35,7 +35,7 @@ class CategoriesController extends UserController
 
     public function show($id)
     {
-        $categories = Categories::find($id);
+        $categories = Category::find($id);
 
         if (is_null($categories)) {
             return response()->json(['status' => 404, 'data' => 'categoria não encontrada!']);
@@ -47,7 +47,7 @@ class CategoriesController extends UserController
     public function update(CategoyRequest $request, $id)
     {
         try {
-            $input = Categories::findOrFail($id);
+            $input = Category::findOrFail($id);
 
             $input->update($request->all());
         }catch (\Exception $e){
@@ -61,9 +61,9 @@ class CategoriesController extends UserController
         return response()->json(['success' => 200, 'data' => new CategoryResource($input), 'message' => 'categoria atualizada com sucesso!']);
     }
 
-    public function destroy(Categories $categories, $id)
+    public function destroy(Category $categories, $id)
     {
-        $categories = Categories::findOrFail($id);
+        $categories = Category::findOrFail($id);
         $categories->delete();
         return response()->json(['success' => 200, 'data' => 'produto deletado com sucesso!']);
     }

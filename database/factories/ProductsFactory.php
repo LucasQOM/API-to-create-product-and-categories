@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Products;
-use App\Models\Categories;
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ProductsFactory extends Factory
@@ -24,7 +24,7 @@ class ProductsFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'categories_id' => Categories::inRandomOrder()->first()->id,
+            'categories_id' => Category::inRandomOrder()->first()->id,
             'code' => $this->faker->numerify(),
             'price' => $this->faker->randomFloat(2, 0, 8),
             'file' => $this->faker->sentence($nbWords = 6, $variableNbWords = true),
